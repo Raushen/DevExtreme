@@ -189,7 +189,8 @@ export default class DataGrid extends Widget {
   getFilterRangeOverlay(): Selector {
     return this.body.find(`.${this.addWidgetPrefix(CLASS.filterRangeOverlay)}`);
   }
-  getFocusOverlay() {
+
+  getFocusOverlay(): Selector {
     return this.body.find(`.${this.addWidgetPrefix(CLASS.focusOverlay)}`);
   }
 

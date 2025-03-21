@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import dxCardView from "devextreme/ui/card_view";
 import { wrapDxWithReact } from "../utils";
-import { items, store } from "./data";
+import { store } from "./data";
+import { generatedData } from "./generatedData";
 
 const CardView = wrapDxWithReact(dxCardView);
 
 const dataSources = {
   empty: [],
-  local: items,
+  local: generatedData,
   remote: store,
 }
 
@@ -29,12 +30,44 @@ const columns = {
     "SaleAmount",
   ],
   local: [
-    {
-      dataField: 'column1'
-    }, {
-      dataField: 'column2'
-    }
+      'firstName',
+      'lastName',
+      'gender',
+      'birthDate'
   ],
+  localHeaderFilter: [
+    {
+      dataField: 'firstName',
+      headerFilter: {
+        allowSelectAll: false,
+        search: {
+          enabled: true,
+        },
+        values: ['Anet', 'Annabela'],
+      },
+    },
+    {
+        dataField: 'lastName',
+        headerFilter: {
+          filterType: 'exclude',
+          values: ['Abbey'],
+        }
+    },
+    {
+      dataField: 'gender',
+      allowHeaderFiltering: false,
+    },
+    {
+      dataField: 'birthDate',
+      dataType: 'date',
+      calculateCellValue: (data) => {
+        return new Date(data.birthDate);
+      },
+      calculateDisplayValue: (data) => {
+        return new Date(data.birthDate).toDateString();
+      }
+    },
+  ]
 }
 
 const meta: Meta<typeof CardView> = {
@@ -69,7 +102,13 @@ const meta: Meta<typeof CardView> = {
       options: Object.keys(columns),
       mapping: columns,
       control: { type: 'radio' },
-    }
+    },
+    headerFilter: {
+      control: 'object',
+    },
+    searchPanel: {
+      control: 'object',
+    },
   }
 };
 
@@ -81,7 +120,8 @@ export const DefaultMode: Story = {
   args: {
     dataSource: 'local',
     width: "100%",
-    height: '500px',
+    // TODO: Fix height limit
+    // height: '500px',
     keyExpr: "OrderNumber",
     cardsPerRow: "auto",
     paging: {
@@ -129,4 +169,42 @@ export const EmptyCardView: Story = {
     dataSource: 'empty',
   },
 };
+
+export const SearchCardView: Story = {
+  ...DefaultMode,
+  args: {
+    ...DefaultMode.args,
+    dataSource: 'local',
+    columns: 'local',
+    searchPanel: {
+      highlightCaseSensitive: false,
+      highlightSearchText: true,
+      text: '',
+    }
+  }
+}
+
+export const HeaderFilterStory: Story = {
+  ...DefaultMode,
+  args: {
+    ...DefaultMode.args,
+    headerFilter: {
+      visible: true,
+      width: 252,
+      height: 325,
+      allowSelectAll: true,
+      search: {
+        enabled: false,
+        timeout: 500,
+        mode: 'contains',
+        editorOptions: {},
+      },
+      texts: {
+        emptyValue: 'empty',
+        ok: 'ok',
+        cancel: 'cancel',
+      },
+    }
+  }
+}
 

@@ -26,7 +26,7 @@ import { ItemsController } from './items_controller/items_controller';
 import { MainView } from './main_view';
 import { defaultOptions, defaultOptionsRules, type Options } from './options';
 import { PagerView } from './pager/view';
-import { SearchController } from './search/controller';
+import * as SearchControllerModule from './search/index';
 import { ToolbarController } from './toolbar/controller';
 import { ToolbarView } from './toolbar/view';
 import { WidgetMock } from './widget_mock';
@@ -57,7 +57,7 @@ export class GridCoreNewBase<
 
   private errorController!: ErrorController;
 
-  private searchController!: SearchController;
+  public searchController!: SearchControllerModule.SearchController;
 
   private searchView!: SearchView;
 
@@ -77,7 +77,7 @@ export class GridCoreNewBase<
     this.diContext.register(EditingController);
     this.diContext.register(PagerView);
     this.diContext.register(ColumnsChooserView);
-    this.diContext.register(SearchController);
+    this.diContext.register(SearchControllerModule.SearchController);
     this.diContext.register(SearchView);
     this.diContext.register(FilterControllerModule.FilterController);
     this.diContext.register(FilterControllerModule.FilterPanelView);
@@ -104,7 +104,7 @@ export class GridCoreNewBase<
     this.toolbarView = this.diContext.get(ToolbarView);
     // this.editingController = this.diContext.get(EditingController);
     this.pagerView = this.diContext.get(PagerView);
-    this.searchController = this.diContext.get(SearchController);
+    this.searchController = this.diContext.get(SearchControllerModule.SearchController);
     this.searchView = this.diContext.get(SearchView);
     this.errorController = this.diContext.get(ErrorController);
     this.filterController = this.diContext.get(FilterControllerModule.FilterController);
@@ -168,7 +168,9 @@ export class GridCoreNewBase<
 export class GridCoreNew extends ColumnsControllerModule.PublicMethods(
   DataControllerModule.PublicMethods(
     FilterControllerModule.PublicMethods(
-      GridCoreNewBase,
+      SearchControllerModule.PublicMethods(
+        GridCoreNewBase,
+      ),
     ),
   ),
 ) {}

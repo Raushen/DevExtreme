@@ -13,6 +13,7 @@ import { ColumnsController } from '../columns_controller';
 import { FilterController } from '../filtering';
 import type { Options } from '../options';
 import { OptionsControllerMock } from '../options_controller/options_controller.mock';
+import { SearchController } from '../search/controller';
 import { SortingController } from '../sorting_controller';
 import { DataController } from './data_controller';
 
@@ -28,7 +29,13 @@ const setup = (options: Options) => {
   const filterController = new FilterController(optionsController);
   const columnsController = new ColumnsController(optionsController);
   const sortingController = new SortingController(optionsController, columnsController);
-  const dataController = new DataController(optionsController, sortingController, filterController);
+  const searchController = new SearchController(optionsController, columnsController);
+  const dataController = new DataController(
+    optionsController,
+    sortingController,
+    filterController,
+    searchController,
+  );
 
   return {
     optionsController,

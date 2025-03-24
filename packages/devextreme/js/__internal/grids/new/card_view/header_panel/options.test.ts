@@ -9,6 +9,7 @@ import { ColumnsController } from '../../grid_core/columns_controller';
 import { DataController } from '../../grid_core/data_controller';
 import { FilterController } from '../../grid_core/filtering';
 import { Sortable } from '../../grid_core/inferno_wrappers/sortable';
+import { SearchController } from '../../grid_core/search/controller';
 import { SortingController } from '../../grid_core/sorting_controller';
 import type { Options } from '../options';
 import { OptionsControllerMock } from '../options_controller.mock';
@@ -21,8 +22,14 @@ const setup = (options: Options) => {
   const optionsController = new OptionsControllerMock(options);
   const filterController = new FilterController(optionsController);
   const columnsController = new ColumnsController(optionsController);
+  const searchController = new SearchController(optionsController, columnsController);
   const sortingController = new SortingController(optionsController, columnsController);
-  const dataController = new DataController(optionsController, sortingController, filterController);
+  const dataController = new DataController(
+    optionsController,
+    sortingController,
+    filterController,
+    searchController,
+  );
   const headerFilterController = new HeaderFilterController(
     optionsController,
     dataController,

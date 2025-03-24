@@ -5,6 +5,7 @@ import { DataController } from '../data_controller/data_controller';
 import { FilterController } from '../filtering';
 import type { Options } from '../options';
 import { OptionsControllerMock } from '../options_controller/options_controller.mock';
+import { SearchController } from '../search';
 import { SortingController } from '../sorting_controller';
 import { PagerView } from './view';
 
@@ -20,7 +21,13 @@ const createPagerView = (options?: Options) => {
   const filterController = new FilterController(optionsController);
   const columnsController = new ColumnsController(optionsController);
   const sortingController = new SortingController(optionsController, columnsController);
-  const dataController = new DataController(optionsController, sortingController, filterController);
+  const searchController = new SearchController(optionsController, columnsController);
+  const dataController = new DataController(
+    optionsController,
+    sortingController,
+    filterController,
+    searchController,
+  );
 
   const pager = new PagerView(dataController, optionsController);
 

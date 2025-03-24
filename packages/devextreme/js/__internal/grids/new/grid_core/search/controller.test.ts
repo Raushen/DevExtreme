@@ -7,6 +7,7 @@ import { OptionsControllerMock } from '@ts/grids/new/card_view/options_controlle
 import type { Options } from '@ts/grids/new/grid_core/options';
 import { splitHighlightedText } from '@ts/grids/new/grid_core/search/utils';
 
+import { ColumnsController } from '../columns_controller/columns_controller';
 import { SearchController } from './controller';
 
 jest.mock('@ts/grids/new/grid_core/search/utils', () => ({
@@ -15,7 +16,8 @@ jest.mock('@ts/grids/new/grid_core/search/utils', () => ({
 
 const setup = (config: Options = {}) => {
   const options = new OptionsControllerMock(config);
-  const controller = new SearchController(options);
+  const columnsController = new ColumnsController(options);
+  const controller = new SearchController(options, columnsController);
 
   return { options, controller };
 };

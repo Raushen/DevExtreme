@@ -13,8 +13,8 @@ const setup = (config: Options = {}) => {
   const options = new OptionsControllerMock(config);
   const filterController = new FilterController(options);
   const searchController = new SearchController(options);
+  const columnsController = new ColumnsController(options);
   const dataController = new DataController(options, filterController);
-  const columnsController = new ColumnsController(options, dataController);
   const itemsController = new ItemsController(
     dataController,
     columnsController,

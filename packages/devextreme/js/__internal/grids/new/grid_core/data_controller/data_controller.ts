@@ -14,6 +14,7 @@ import { FilterController } from '../filtering/filter_controller';
 // import { EditingController } from '../editing/controller';
 // import type { Change } from '../editing/types';
 import { OptionsController } from '../options_controller/options_controller';
+import { SearchController } from '../search';
 import type { DataObject, Key } from './types';
 import {
   getLocalLoadOptions,
@@ -91,11 +92,12 @@ export class DataController {
     [this.normalizedRemoteOptions],
   );
 
-  public static dependencies = [OptionsController, FilterController] as const;
+  public static dependencies = [OptionsController, FilterController, SearchController] as const;
 
   constructor(
     private readonly options: OptionsController,
     private readonly filterController: FilterController,
+    private readonly searchController: SearchController,
   ) {
     effect(
       (dataSource) => {
@@ -173,7 +175,15 @@ export class DataController {
     );
 
     effect(
-      (dataSource, pageIndex, pageSize, displayFilter, pagingEnabled) => {
+      (
+        dataSource,
+        pageIndex,
+        pageSize,
+        displayFilter,
+        pagingEnabled,
+        searchColumnList,
+        searchText,
+      ) => {
         let someParamChanged = false;
         if (dataSource.pageIndex() !== pageIndex) {
           dataSource.pageIndex(pageIndex);
@@ -183,8 +193,8 @@ export class DataController {
           dataSource.pageSize(pageSize);
           someParamChanged ||= true;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-        if (dataSource.requireTotalCount() !== true) {
+
+        if (!dataSource.requireTotalCount()) {
           dataSource.requireTotalCount(true);
           someParamChanged ||= true;
         }
@@ -194,6 +204,16 @@ export class DataController {
         }
         if (dataSource.paginate() !== pagingEnabled) {
           dataSource.paginate(pagingEnabled);
+          someParamChanged ||= true;
+        }
+
+        if (dataSource.searchExpr() !== searchColumnList) {
+          dataSource.searchExpr(searchColumnList);
+          someParamChanged ||= true;
+        }
+
+        if (dataSource.searchValue() !== searchText) {
+          dataSource.searchValue(searchText);
           someParamChanged ||= true;
         }
 
@@ -208,6 +228,8 @@ export class DataController {
         this.pageSize,
         this.filterController.displayFilter,
         this.pagingEnabled,
+        this.searchController.searchColumnList,
+        this.searchController.searchTextOption,
       ],
     );
   }

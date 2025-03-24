@@ -15,6 +15,7 @@ import { FilterController } from '../filtering/filter_controller';
 // import type { Change } from '../editing/types';
 import { OptionsController } from '../options_controller/options_controller';
 import { SearchController } from '../search';
+import { SortingController } from '../sorting_controller/sorting_controller';
 import type { DataObject, Key } from './types';
 import {
   getLocalLoadOptions,
@@ -92,10 +93,16 @@ export class DataController {
     [this.normalizedRemoteOptions],
   );
 
-  public static dependencies = [OptionsController, FilterController, SearchController] as const;
+  public static dependencies = [
+    OptionsController,
+    SortingController,
+    FilterController,
+    SearchController,
+  ] as const;
 
   constructor(
     private readonly options: OptionsController,
+    private readonly sortingController: SortingController,
     private readonly filterController: FilterController,
     private readonly searchController: SearchController,
   ) {
@@ -181,6 +188,7 @@ export class DataController {
         pageSize,
         displayFilter,
         pagingEnabled,
+        sortParameters,
         searchColumnList,
         searchText,
       ) => {
@@ -206,6 +214,10 @@ export class DataController {
           dataSource.paginate(pagingEnabled);
           someParamChanged ||= true;
         }
+        if (sortParameters && dataSource.sort() !== sortParameters) {
+          dataSource.sort(sortParameters);
+          someParamChanged ||= true;
+        }
 
         if (dataSource.searchExpr() !== searchColumnList) {
           dataSource.searchExpr(searchColumnList);
@@ -228,6 +240,7 @@ export class DataController {
         this.pageSize,
         this.filterController.displayFilter,
         this.pagingEnabled,
+        this.sortingController.sortParameters,
         this.searchController.searchColumnList,
         this.searchController.searchTextOption,
       ],

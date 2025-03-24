@@ -27,13 +27,37 @@ const columns = {
     "StoreCity",
     "StoreState",
     "Employee",
-    "SaleAmount",
+    {
+      dataField: "SaleAmount",
+      dataType: "number",
+    },
   ],
   local: [
       'firstName',
       'lastName',
       'gender',
       'birthDate'
+  ],
+  sortedRemote: [
+    {
+      dataField: "OrderNumber",
+      alignment: 'right',
+      dataType: "number",
+      sortOrder: 'asc',
+      sortIndex: 1,
+    },
+    {
+      dataField: "OrderDate",
+      visible: false,
+    },
+    {
+      dataField: "StoreCity",
+      sortOrder: 'desc',
+      sortIndex: 0,
+    },
+    "StoreState",
+    "Employee",
+    "SaleAmount",
   ],
   localHeaderFilter: [
     {
@@ -167,6 +191,27 @@ export const EmptyCardView: Story = {
   args: {
     ...DefaultMode.args,
     dataSource: 'empty',
+  },
+};
+
+export const CardViewWithCover  : Story = {
+  ...DefaultMode,
+  args: {
+    ...DefaultMode.args,
+    cardCover: {
+      imageExpr: (data) => `https://js.devexpress.com/jQuery/Demos/WidgetsGallery/JSDemos/${data.picture}`,
+      altExpr: 'FirstName',
+      // ratio: '2 / 1',
+    },
+  },
+};
+
+export const SortedCardView: Story = {
+  ...DefaultMode,
+  args: {
+    ...DefaultMode.args,
+    dataSource: 'remote',
+    columns: 'sortedRemote',
   },
 };
 

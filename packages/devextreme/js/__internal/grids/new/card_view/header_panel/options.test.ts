@@ -20,9 +20,9 @@ const setup = (options: Options) => {
   rootElement.classList.add('test-container');
 
   const optionsController = new OptionsControllerMock(options);
-  const filterController = new FilterController(optionsController);
   const columnsController = new ColumnsController(optionsController);
   const searchController = new SearchController(optionsController, columnsController);
+  const filterController = new FilterController(optionsController, searchController);
   const sortingController = new SortingController(optionsController, columnsController);
   const dataController = new DataController(
     optionsController,

@@ -1,5 +1,6 @@
 import type { DataType } from '@js/common';
 import messageLocalization from '@js/localization/message';
+import filterUtils from '@js/ui/shared/filtering';
 
 import type { DataObject } from '../data_controller/types';
 import type { Template, WithRequired } from '../types';
@@ -28,6 +29,7 @@ export const defaultColumnProperties = {
   calculateDisplayValue(data): unknown {
     return this.calculateCellValue(data);
   },
+  calculateFilterExpression: filterUtils.defaultCalculateFilterExpression,
   alignment: 'left',
   visible: true,
   allowReordering: true,

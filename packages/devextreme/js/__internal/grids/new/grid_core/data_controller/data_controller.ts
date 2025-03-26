@@ -189,8 +189,6 @@ export class DataController {
         displayFilter,
         pagingEnabled,
         sortParameters,
-        searchColumnList,
-        searchText,
       ) => {
         let someParamChanged = false;
         if (dataSource.pageIndex() !== pageIndex) {
@@ -219,16 +217,6 @@ export class DataController {
           someParamChanged ||= true;
         }
 
-        if (dataSource.searchExpr() !== searchColumnList) {
-          dataSource.searchExpr(searchColumnList);
-          someParamChanged ||= true;
-        }
-
-        if (dataSource.searchValue() !== searchText) {
-          dataSource.searchValue(searchText);
-          someParamChanged ||= true;
-        }
-
         if (someParamChanged || !dataSource.isLoaded()) {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           dataSource.load();
@@ -241,8 +229,6 @@ export class DataController {
         this.filterController.displayFilter,
         this.pagingEnabled,
         this.sortingController.sortParameters,
-        this.searchController.searchColumnList,
-        this.searchController.searchTextOption,
       ],
     );
   }

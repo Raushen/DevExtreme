@@ -4,27 +4,15 @@ import {
 } from '@jest/globals';
 import ArrayStore from '@ts/data/m_array_store';
 
-import { ColumnsController } from '../columns_controller';
-import { FilterController } from '../filtering';
 import type { Options } from '../options';
-import { OptionsControllerMock } from '../options_controller/options_controller.mock';
-import { SearchController } from '../search';
-import { SortingController } from '../sorting_controller';
+import { getContext } from '../test_utils';
 import { DataController } from './data_controller';
 import { PublicMethods } from './public_methods';
 
-const setup = (options: Options) => {
-  const optionsController = new OptionsControllerMock(options);
-  const filterController = new FilterController(optionsController);
-  const columnsController = new ColumnsController(optionsController);
-  const sortingController = new SortingController(optionsController, columnsController);
-  const searchController = new SearchController(optionsController, columnsController);
-  const dataController = new DataController(
-    optionsController,
-    sortingController,
-    filterController,
-    searchController,
-  );
+const setup = (config: Options) => {
+  const context = getContext(config);
+
+  const dataController = context.get(DataController);
 
   // @ts-expect-error
   const gridCore = new (PublicMethods(class {
@@ -32,7 +20,6 @@ const setup = (options: Options) => {
   }))();
 
   return {
-    optionsController,
     dataController,
     gridCore,
   };

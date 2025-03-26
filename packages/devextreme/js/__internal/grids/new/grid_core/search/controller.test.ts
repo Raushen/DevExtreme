@@ -3,11 +3,10 @@ import {
   afterEach,
   describe, expect, it, jest,
 } from '@jest/globals';
-import { OptionsControllerMock } from '@ts/grids/new/card_view/options_controller.mock';
 import type { Options } from '@ts/grids/new/grid_core/options';
 import { splitHighlightedText } from '@ts/grids/new/grid_core/search/utils';
 
-import { ColumnsController } from '../columns_controller/columns_controller';
+import { getContext } from '../test_utils';
 import { SearchController } from './controller';
 
 jest.mock('@ts/grids/new/grid_core/search/utils', () => ({
@@ -15,11 +14,13 @@ jest.mock('@ts/grids/new/grid_core/search/utils', () => ({
 }));
 
 const setup = (config: Options = {}) => {
-  const options = new OptionsControllerMock(config);
-  const columnsController = new ColumnsController(options);
-  const controller = new SearchController(options, columnsController);
+  const context = getContext(config);
 
-  return { options, controller };
+  const searchController = context.get(SearchController);
+
+  return {
+    searchController,
+  };
 };
 
 describe('Search', () => {
@@ -29,7 +30,7 @@ describe('Search', () => {
     });
 
     it('should have highlightTextOptions$ from widget options', () => {
-      const { controller } = setup({
+      const { searchController } = setup({
         searchPanel: {
           highlightSearchText: true,
           highlightCaseSensitive: false,
@@ -37,7 +38,7 @@ describe('Search', () => {
         },
       });
 
-      const stateSlice = controller.highlightTextOptions.unreactive_get();
+      const stateSlice = searchController.highlightTextOptions.unreactive_get();
 
       expect(stateSlice).toStrictEqual({
         enabled: true,
@@ -47,7 +48,7 @@ describe('Search', () => {
     });
 
     it('getHighlightText should call util function', () => {
-      const { controller } = setup({
+      const { searchController } = setup({
         searchPanel: {
           highlightSearchText: true,
           highlightCaseSensitive: false,
@@ -55,7 +56,7 @@ describe('Search', () => {
         },
       });
 
-      controller.getHighlightedText('SOURCE_TEXT');
+      searchController.getHighlightedText('SOURCE_TEXT');
 
       expect(splitHighlightedText).toHaveBeenCalledTimes(1);
       expect(splitHighlightedText).toHaveBeenCalledWith('SOURCE_TEXT', {

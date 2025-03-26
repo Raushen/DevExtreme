@@ -9,12 +9,10 @@ import DataSource from '@js/data/data_source';
 import { logger } from '@ts/core/utils/m_console';
 import ArrayStore from '@ts/data/m_array_store';
 
-import { ColumnsController } from '../columns_controller';
-import { FilterController } from '../filtering';
 import type { Options } from '../options';
-import { OptionsControllerMock } from '../options_controller/options_controller.mock';
-import { SearchController } from '../search/controller';
-import { SortingController } from '../sorting_controller';
+import { OptionsController } from '../options_controller/options_controller';
+import type { OptionsControllerMock } from '../options_controller/options_controller.mock';
+import { getContext } from '../test_utils';
 import { DataController } from './data_controller';
 
 beforeAll(() => {
@@ -24,21 +22,14 @@ afterAll(() => {
   jest.restoreAllMocks();
 });
 
-const setup = (options: Options) => {
-  const optionsController = new OptionsControllerMock(options);
-  const filterController = new FilterController(optionsController);
-  const columnsController = new ColumnsController(optionsController);
-  const sortingController = new SortingController(optionsController, columnsController);
-  const searchController = new SearchController(optionsController, columnsController);
-  const dataController = new DataController(
-    optionsController,
-    sortingController,
-    filterController,
-    searchController,
-  );
+const setup = (config: Options) => {
+  const context = getContext(config);
+
+  const dataController = context.get(DataController);
+  const options = context.get(OptionsController) as OptionsControllerMock;
 
   return {
-    optionsController,
+    options,
     dataController,
   };
 };
@@ -207,7 +198,7 @@ describe('Options', () => {
 
   describe('paging.pageIndex', () => {
     it('should change current page', () => {
-      const { dataController, optionsController } = setup({
+      const { dataController, options } = setup({
         dataSource: [{ a: '1' }, { a: '2' }, { a: '3' }, { a: '4' }],
         paging: {
           pageSize: 2,
@@ -218,7 +209,7 @@ describe('Options', () => {
       let items = dataController.items.unreactive_get();
       expect(items).toEqual([{ a: '3' }, { a: '4' }]);
 
-      optionsController.option('paging.pageIndex', 0);
+      options.option('paging.pageIndex', 0);
       items = dataController.items.unreactive_get();
       expect(items).toEqual([{ a: '1' }, { a: '2' }]);
     });
@@ -226,7 +217,7 @@ describe('Options', () => {
 
   describe('paging.pageSize', () => {
     it('should change size of current page', () => {
-      const { dataController, optionsController } = setup({
+      const { dataController, options } = setup({
         dataSource: [{ a: '1' }, { a: '2' }, { a: '3' }, { a: '4' }],
         paging: {
           pageSize: 2,
@@ -236,7 +227,7 @@ describe('Options', () => {
       let items = dataController.items.unreactive_get();
       expect(items).toEqual([{ a: '1' }, { a: '2' }]);
 
-      optionsController.option('paging.pageSize', 3);
+      options.option('paging.pageSize', 3);
       items = dataController.items.unreactive_get();
       expect(items).toEqual([{ a: '1' }, { a: '2' }, { a: '3' }]);
     });

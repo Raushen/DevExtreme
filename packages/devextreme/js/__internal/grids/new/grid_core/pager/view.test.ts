@@ -1,41 +1,33 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { ColumnsController } from '../columns_controller';
+import type { OptionsControllerMock } from '../../card_view/options_controller.mock';
 import { DataController } from '../data_controller/data_controller';
-import { FilterController } from '../filtering';
 import type { Options } from '../options';
-import { OptionsControllerMock } from '../options_controller/options_controller.mock';
-import { SearchController } from '../search';
-import { SortingController } from '../sorting_controller';
+import { OptionsController } from '../options_controller/options_controller';
+import { getContext } from '../test_utils';
 import { PagerView } from './view';
 
-const createPagerView = (options?: Options) => {
+const createPagerView = (config?: Options) => {
   const rootElement = document.createElement('div');
-  const optionsController = new OptionsControllerMock(options ?? {
+  const actualOptions = config ?? {
     dataSource: [],
     pager: {
       visible: true,
     },
-  });
+  };
 
-  const filterController = new FilterController(optionsController);
-  const columnsController = new ColumnsController(optionsController);
-  const sortingController = new SortingController(optionsController, columnsController);
-  const searchController = new SearchController(optionsController, columnsController);
-  const dataController = new DataController(
-    optionsController,
-    sortingController,
-    filterController,
-    searchController,
-  );
+  const context = getContext(actualOptions);
 
-  const pager = new PagerView(dataController, optionsController);
+  const dataController = context.get(DataController);
+  const options = context.get(OptionsController) as OptionsControllerMock;
+
+  const pager = new PagerView(dataController, options);
 
   pager.render(rootElement);
 
   return {
     rootElement,
-    optionsController,
+    options,
   };
 };
 
@@ -132,7 +124,7 @@ describe('Applying options', () => {
 
   describe('when changing a visible to \'false\' at runtime', () => {
     it('Pager should be hidden', () => {
-      const { rootElement, optionsController } = createPagerView({
+      const { rootElement, options } = createPagerView({
         dataSource: [...new Array(4)].map((_, index) => ({ field: `test_${index}` })),
         paging: {
           pageIndex: 6,
@@ -143,7 +135,7 @@ describe('Applying options', () => {
         },
       });
 
-      optionsController.option('pager.visible', false);
+      options.option('pager.visible', false);
 
       expect(rootElement).toMatchSnapshot();
     });
@@ -151,7 +143,7 @@ describe('Applying options', () => {
 
   describe('when changing a visible to \'true\' at runtime', () => {
     it('Pager should be visible', () => {
-      const { rootElement, optionsController } = createPagerView({
+      const { rootElement, options } = createPagerView({
         dataSource: [...new Array(4)].map((_, index) => ({ field: `test_${index}` })),
         paging: {
           pageIndex: 6,
@@ -162,7 +154,7 @@ describe('Applying options', () => {
         },
       });
 
-      optionsController.option('pager.visible', true);
+      options.option('pager.visible', true);
 
       expect(rootElement).toMatchSnapshot();
     });
@@ -206,7 +198,7 @@ describe('Applying options', () => {
 
   describe('when changing an allowedPageSizes to custom values at runtime', () => {
     it('applies custom values', () => {
-      const { rootElement, optionsController } = createPagerView({
+      const { rootElement, options } = createPagerView({
         dataSource: [...new Array(20)].map((_, index) => ({ field: `test_${index}` })),
         paging: {
           pageIndex: 6,
@@ -217,7 +209,7 @@ describe('Applying options', () => {
         },
       });
 
-      optionsController.option('pager.allowedPageSizes', [4, 10, 20]);
+      options.option('pager.allowedPageSizes', [4, 10, 20]);
 
       expect(rootElement).toMatchSnapshot();
     });

@@ -21,9 +21,9 @@ export class PopupMode implements EditMode {
   constructor(
     private readonly options: OptionsController,
     private readonly editing: EditingController,
-    private readonly toolbar: ToolbarController,
+    private readonly toolbarController: ToolbarController,
   ) {
-    this.toolbar.addDefaultItem(this.addCardButton);
+    this.toolbarController.addDefaultItem(this.addCardButton);
   }
 
   public addNewCardImpl(): Promise<void> {

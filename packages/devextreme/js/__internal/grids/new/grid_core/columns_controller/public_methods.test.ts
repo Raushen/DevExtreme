@@ -1,26 +1,14 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { DataController } from '../data_controller';
-import { FilterController } from '../filtering';
-import { OptionsControllerMock } from '../options_controller/options_controller.mock';
-import { SearchController } from '../search';
-import { SortingController } from '../sorting_controller';
+import { getContext } from '../test_utils';
 import { ColumnsController } from './columns_controller';
 import type { Options } from './options';
 import { PublicMethods } from './public_methods';
 
 const setup = (config: Options = {}) => {
-  const options = new OptionsControllerMock(config);
-  const filterController = new FilterController(options);
-  const columnsController = new ColumnsController(options);
-  const searchController = new SearchController(options, columnsController);
-  const sortingController = new SortingController(options, columnsController);
-  const dataController = new DataController(
-    options,
-    sortingController,
-    filterController,
-    searchController,
-  );
+  const context = getContext(config);
+
+  const columnsController = context.get(ColumnsController);
 
   // @ts-expect-error
   const gridCore = new (PublicMethods(class {
@@ -28,9 +16,6 @@ const setup = (config: Options = {}) => {
   }))();
 
   return {
-    options,
-    dataController,
-    columnsController,
     gridCore,
   };
 };

@@ -1,34 +1,18 @@
 /* eslint-disable spellcheck/spell-checker, no-spaced-func */
 import { describe, expect, it } from '@jest/globals';
-import { ColumnsController } from '@ts/grids/new/grid_core/columns_controller';
 import type { Column } from '@ts/grids/new/grid_core/columns_controller/types';
-import { DataController } from '@ts/grids/new/grid_core/data_controller';
-import { FilterController } from '@ts/grids/new/grid_core/filtering';
-import { HeaderFilterController } from '@ts/grids/new/grid_core/filtering/header_filter/controller';
 import type { HeaderFilterColumnOptions } from '@ts/grids/new/grid_core/filtering/header_filter/types';
 import type { Options } from '@ts/grids/new/grid_core/options';
-import { OptionsControllerMock } from '@ts/grids/new/grid_core/options_controller/options_controller.mock';
 
-import { SearchController } from '../../search';
-import { SortingController } from '../../sorting_controller/sorting_controller';
+import { ColumnsController } from '../../columns_controller/columns_controller';
+import { getContext } from '../../test_utils';
+import { HeaderFilterController } from './controller';
 
 const setup = (config: Options = {}) => {
-  const options = new OptionsControllerMock(config);
-  const filterController = new FilterController(options);
-  const columnsController = new ColumnsController(options);
-  const sortingController = new SortingController(options, columnsController);
-  const searchController = new SearchController(options, columnsController);
-  const dataController = new DataController(
-    options,
-    sortingController,
-    filterController,
-    searchController,
-  );
-  const headerFilterController = new HeaderFilterController(
-    options,
-    dataController,
-    columnsController,
-  );
+  const context = getContext(config);
+
+  const headerFilterController = context.get(HeaderFilterController);
+  const columnsController = context.get(ColumnsController);
 
   return {
     headerFilterController,

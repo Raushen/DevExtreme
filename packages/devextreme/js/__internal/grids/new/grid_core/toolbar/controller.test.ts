@@ -4,24 +4,21 @@ import { describe, expect, it } from '@jest/globals';
 import { state } from '@ts/core/reactive';
 
 import type { Options } from '../options';
-import { OptionsControllerMock } from '../options_controller/options_controller.mock';
+import { getContext } from '../test_utils';
 import { ToolbarController } from './controller';
 
-const createToolbarController = (options?: Options): {
-  toolbarController: ToolbarController;
-  optionsController: OptionsControllerMock;
-} => {
-  const optionsController = new OptionsControllerMock(options ?? {
+const setup = (config?: Options) => {
+  const actualOptions = config ?? {
     toolbar: {
       visible: true,
     },
-  });
+  };
+  const context = getContext(actualOptions);
 
-  const toolbarController = new ToolbarController(optionsController);
+  const toolbarController = context.get(ToolbarController);
 
   return {
     toolbarController,
-    optionsController,
   };
 };
 
@@ -29,7 +26,7 @@ describe('ToolbarController', () => {
   describe('items', () => {
     describe('when user items are specified', () => {
       it('should contain processed toolbar items', () => {
-        const { toolbarController } = createToolbarController({
+        const { toolbarController } = setup({
           toolbar: {
             items: [{ location: 'before' }],
           },
@@ -41,7 +38,7 @@ describe('ToolbarController', () => {
 
     describe('when default items and user items are specified', () => {
       it('should contain processed toolbar items', () => {
-        const { toolbarController } = createToolbarController({
+        const { toolbarController } = setup({
           toolbar: {
             items: ['searchPanel', { location: 'before' }],
           },
@@ -59,7 +56,7 @@ describe('ToolbarController', () => {
 
   describe('addDefaultItem', () => {
     it('should add new default item to items', () => {
-      const { toolbarController } = createToolbarController();
+      const { toolbarController } = setup();
 
       toolbarController.addDefaultItem({ name: 'searchPanel', location: 'after' });
 
@@ -69,7 +66,7 @@ describe('ToolbarController', () => {
     });
 
     it('item should toggle default item when needUpdate changes', () => {
-      const { toolbarController } = createToolbarController();
+      const { toolbarController } = setup();
       const needRender = state(true);
 
       toolbarController.addDefaultItem({ name: 'searchPanel', location: 'after' }, needRender);

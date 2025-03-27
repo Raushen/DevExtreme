@@ -40,6 +40,7 @@ export const defaultColumnProperties = {
   allowSearch: true,
   trueText: messageLocalization.format('dxDataGrid-trueText'),
   falseText: messageLocalization.format('dxDataGrid-falseText'),
+  showInColumnChooser: true,
 } satisfies Partial<Column>;
 
 export const defaultColumnPropertiesByDataType: Record<

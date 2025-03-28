@@ -84,7 +84,6 @@ export class GridCoreNewBase<
     this.diContext.register(EditingController);
     this.diContext.register(PagerView);
     this.diContext.register(SearchControllerModule.SearchController);
-    this.diContext.register(SearchView);
     this.diContext.register(ColumnChooserModule.ColumnChooserController);
     this.diContext.register(ColumnChooserModule.ColumnChooserView);
     this.diContext.register(FilterControllerModule.FilterController);
@@ -93,6 +92,7 @@ export class GridCoreNewBase<
     this.diContext.register(HeaderFilterController);
     this.diContext.register(HeaderFilterPopupView);
     this.diContext.register(ErrorController);
+    this.diContext.register(SearchView);
   }
 
   protected _initWidgetMock() {
@@ -113,12 +113,12 @@ export class GridCoreNewBase<
     // this.editingController = this.diContext.get(EditingController);
     this.pagerView = this.diContext.get(PagerView);
     this.searchController = this.diContext.get(SearchControllerModule.SearchController);
-    this.searchView = this.diContext.get(SearchView);
     this.columnChooserController = this.diContext.get(ColumnChooserModule.ColumnChooserController);
     this.columnChooserView = this.diContext.get(ColumnChooserModule.ColumnChooserView);
     this.errorController = this.diContext.get(ErrorController);
     this.filterController = this.diContext.get(FilterControllerModule.FilterController);
     this.filterPanelView = this.diContext.get(FilterControllerModule.FilterPanelView);
+    this.searchView = this.diContext.get(SearchView);
   }
 
   protected _init(): void {

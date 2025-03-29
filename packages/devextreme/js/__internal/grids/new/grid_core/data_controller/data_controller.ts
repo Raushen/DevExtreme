@@ -80,6 +80,8 @@ export class DataController {
     [this.totalCount, this.pageSize],
   );
 
+  public readonly isLoaded = state(false);
+
   private readonly normalizedRemoteOptions = computed(
     (remoteOperations, dataSource) => {
       const store = dataSource.store();
@@ -109,6 +111,7 @@ export class DataController {
     effect(
       (dataSource) => {
         const changedCallback = (e?): void => {
+          this.isLoaded.update(true);
           this.onChanged(dataSource, e);
         };
         const loadingChangedCallback = (): void => {

@@ -1,6 +1,7 @@
 /* eslint-disable spellcheck/spell-checker */
 import { DIContext } from '@ts/core/di';
 
+import { ColumnChooserController } from './column_chooser';
 import { ColumnsController } from './columns_controller';
 import { DataController } from './data_controller';
 import { EditingController } from './editing/controller';
@@ -11,6 +12,7 @@ import type { Options } from './options';
 import { OptionsController } from './options_controller/options_controller';
 import { OptionsControllerMock } from './options_controller/options_controller.mock';
 import { SearchController } from './search';
+import { SelectionController } from './selection/controller';
 import { SortingController } from './sorting_controller';
 import { ToolbarController } from './toolbar/controller';
 
@@ -24,6 +26,8 @@ function registerControllers(diContext: DIContext): void {
   diContext.register(DataController);
   diContext.register(ItemsController);
   diContext.register(HeaderFilterController);
+  diContext.register(SelectionController);
+  diContext.register(ColumnChooserController);
 }
 
 export function getContext(config: Options = {}): DIContext {

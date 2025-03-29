@@ -2,54 +2,25 @@
 import {
   describe, expect, it, jest,
 } from '@jest/globals';
-import { HeaderFilterController } from '@ts/grids/new/grid_core/filtering/header_filter';
 import { rerender } from 'inferno';
 
-import { ColumnsController } from '../../grid_core/columns_controller';
-import { DataController } from '../../grid_core/data_controller';
-import { FilterController } from '../../grid_core/filtering';
 import { Sortable } from '../../grid_core/inferno_wrappers/sortable';
-import { SearchController } from '../../grid_core/search/controller';
-import { SortingController } from '../../grid_core/sorting_controller';
+import { getContext } from '../../grid_core/test_utils';
 import type { Options } from '../options';
-import { OptionsControllerMock } from '../options_controller.mock';
 import { HeaderPanelView } from './view';
 
-const setup = (options: Options) => {
+const setup = (config: Options) => {
   const rootElement = document.createElement('div');
   rootElement.classList.add('test-container');
 
-  const optionsController = new OptionsControllerMock(options);
-  const columnsController = new ColumnsController(optionsController);
-  const searchController = new SearchController(optionsController, columnsController);
-  const filterController = new FilterController(optionsController, searchController);
-  const sortingController = new SortingController(optionsController, columnsController);
-  const dataController = new DataController(
-    optionsController,
-    sortingController,
-    filterController,
-    searchController,
-  );
-  const headerFilterController = new HeaderFilterController(
-    optionsController,
-    dataController,
-    columnsController,
-  );
-  const headerPanelView = new HeaderPanelView(
-    sortingController,
-    columnsController,
-    optionsController,
-    headerFilterController,
-  );
+  const context = getContext(config);
+
+  const headerPanelView = context.get(HeaderPanelView);
 
   headerPanelView.render(rootElement);
   rerender();
 
   return {
-    optionsController,
-    dataController,
-    columnsController,
-    headerPanelView,
     rootElement,
   };
 };

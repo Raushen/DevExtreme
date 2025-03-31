@@ -1,8 +1,10 @@
+/* eslint-disable spellcheck/spell-checker */
 import {
   describe, expect, it,
 } from '@jest/globals';
 import CardView from '@ts/grids/new/card_view/widget';
 import type { Options as GridCoreOptions } from '@ts/grids/new/grid_core/options';
+import { rerender } from 'inferno';
 
 const SELECTORS = {
   cardContent: 'dx-cardview-card-content',
@@ -24,13 +26,17 @@ describe('Options', () => {
       dataSource: [
         { Name: 'John Doe' },
       ],
+      columns: [
+        'Name',
+      ],
       searchPanel: {
         text: 'John',
       },
     });
 
-    const content = getCardContent(container);
+    rerender();
 
+    const content = getCardContent(container);
     expect(content).toMatchSnapshot();
   });
 
@@ -44,8 +50,8 @@ describe('Options', () => {
       },
     });
 
+    rerender();
     const content = getCardContent(container);
-
     expect(content).toMatchSnapshot();
   });
 

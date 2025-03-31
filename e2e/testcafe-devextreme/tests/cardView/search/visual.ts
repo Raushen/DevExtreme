@@ -3,7 +3,7 @@ import CardView from 'devextreme-testcafe-models/cardView';
 import url from '../../../helpers/getPageUrl';
 import { createWidget } from '../../../helpers/createWidget';
 import { testScreenshot } from '../../../helpers/themeUtils';
-import { data } from '../helpers/simpleArrayData';
+import { baseConfig } from '../filterPanel/helpers/baseConfig';
 
 fixture`Search.Visual`
   .page(url(__dirname, '../../container.html'));
@@ -21,9 +21,9 @@ test('highlighted search text', async (t) => {
     .expect(compareResults.isValid())
     .ok(compareResults.errorMessages());
 }).before(async () => createWidget('dxCardView', {
-  dataSource: data,
-  searchPanel: {
-    visible: true,
+  ...baseConfig,
+  filterPanel: {
+    ...baseConfig.filterPanel,
     text: 'rt',
   },
   height: 600,

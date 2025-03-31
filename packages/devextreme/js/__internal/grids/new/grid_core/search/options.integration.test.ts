@@ -36,8 +36,12 @@ describe('Options', () => {
 
     rerender();
 
-    const content = getCardContent(container);
-    expect(content).toMatchSnapshot();
+    const highlightedText = container?.querySelectorAll('[class$="__text-part--highlighted"]');
+
+    expect(highlightedText).not.toBeNull();
+    expect(highlightedText?.length).toEqual(1);
+    expect(highlightedText?.length).not.toEqual(3);
+    expect(highlightedText?.[0]?.innerHTML).toEqual('John');
   });
 
   it('searchPanel.text (mismatch)', () => {

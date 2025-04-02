@@ -4,7 +4,6 @@ import { DIContext } from '@ts/core/di';
 import { ColumnChooserController } from './column_chooser';
 import { ColumnsController } from './columns_controller';
 import { DataController } from './data_controller';
-import { EditingController } from './editing/controller';
 import { FilterController } from './filtering';
 import { HeaderFilterController } from './filtering/header_filter';
 import { ItemsController } from './items_controller/items_controller';
@@ -22,7 +21,6 @@ function registerControllers(diContext: DIContext): void {
   diContext.register(ToolbarController);
   diContext.register(SearchController);
   diContext.register(SortingController);
-  diContext.register(EditingController);
   diContext.register(DataController);
   diContext.register(ItemsController);
   diContext.register(HeaderFilterController);

@@ -194,8 +194,7 @@ export class DataController {
           someParamChanged ||= true;
         }
         if (dataSource.filter() !== displayFilter) {
-          const currentFilter = displayFilter ?? null;
-          dataSource.filter(currentFilter);
+          dataSource.filter(displayFilter ?? null);
           someParamChanged ||= true;
         }
         if (dataSource.paginate() !== pagingEnabled) {

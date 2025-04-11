@@ -27,6 +27,7 @@ import { defaultOptions, defaultOptionsRules, type Options } from './options';
 import { PagerView } from './pager/view';
 import * as SearchControllerModule from './search/index';
 import * as SelectionControllerModule from './selection';
+import { SharedController } from './shared/controller';
 import * as SortingControllerModule from './sorting_controller/index';
 import type { SortingController } from './sorting_controller/sorting_controller';
 import { ToolbarController } from './toolbar/controller';
@@ -92,6 +93,7 @@ export class GridCoreNewBase<
     this.diContext.register(HeaderFilterPopupView);
     this.diContext.register(ErrorController);
     this.diContext.register(SearchView);
+    this.diContext.register(SharedController);
   }
 
   protected _initWidgetMock() {

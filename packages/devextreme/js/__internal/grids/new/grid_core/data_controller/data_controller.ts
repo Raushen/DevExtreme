@@ -10,7 +10,7 @@ import { createPromise } from '@ts/core/utils/promise';
 
 import { FilterController } from '../filtering/filter_controller';
 import { OptionsController } from '../options_controller/options_controller';
-import { SearchController } from '../search';
+import { SharedController } from '../shared/controller';
 import { SortingController } from '../sorting_controller/sorting_controller';
 import type { DataObject, Key } from './types';
 import {
@@ -85,15 +85,22 @@ export class DataController {
     OptionsController,
     SortingController,
     FilterController,
-    SearchController,
+    SharedController,
   ] as const;
 
   constructor(
     private readonly options: OptionsController,
     private readonly sortingController: SortingController,
     private readonly filterController: FilterController,
-    private readonly searchController: SearchController,
+    private readonly sharedController: SharedController,
   ) {
+    effect(
+      (dataSource) => {
+        this.sharedController.dataSource.update(dataSource);
+      },
+      [this.dataSource],
+    );
+
     effect(
       (dataSource) => {
         const changedCallback = (e?): void => {

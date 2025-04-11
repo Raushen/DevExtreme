@@ -1,5 +1,5 @@
 import type { Format, SortOrder } from '@js/common';
-import type { ColumnBase } from '@js/common/grids';
+import type { ColumnBase, FilterType } from '@js/common/grids';
 import type { Cell as PublicCell, DataRow as PublicDataRow } from '@js/ui/card_view';
 import type { HeaderFilterColumnOptions } from '@ts/grids/new/grid_core/filtering/header_filter';
 import type { ComponentType } from 'inferno';
@@ -68,4 +68,6 @@ export type Column = Pick<Required<ColumnBase>, InheritedColumnProps> & {
   headerItemCssClass?: string;
   // header filter options for specific column.
   headerFilter?: HeaderFilterColumnOptions;
+
+  filterType?: FilterType;
 };

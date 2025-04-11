@@ -5,6 +5,7 @@ import { ColumnsController } from '@ts/grids/new/grid_core/columns_controller/co
 import { View } from '@ts/grids/new/grid_core/core/view';
 
 import type { Column } from '../../grid_core/columns_controller/types';
+import { getColumnIndexByName } from '../../grid_core/columns_controller/utils';
 import type { PopupState } from '../../grid_core/filtering/header_filter/controller';
 import { getDataSourceOptions, getFilterType } from '../../grid_core/filtering/header_filter/legacy_header_filter';
 import { SharedController } from '../../grid_core/shared/controller';
@@ -103,7 +104,7 @@ export class HeaderPanelView extends View<HeaderPanelProps> {
       rootDataSource,
       {
         ...column,
-        filterType: column.headerFilter?.filterType,
+        filterType: column.filterType,
         filterValues: column.headerFilter?.values,
       },
       // NOTE: Only text used from root options
@@ -122,21 +123,34 @@ export class HeaderPanelView extends View<HeaderPanelProps> {
         type,
         headerFilter: { ...column.headerFilter },
         dataSource: filterDataSourceOptions,
-        filterType: column.headerFilter?.filterType,
+        filterType: column.filterType,
         // NOTE: Copy array because of mutations in legacy code
         filterValues: Array.isArray(column.headerFilter?.values)
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           ? [...column.headerFilter!.values]
           : column.headerFilter?.values,
         apply() {
-          colsController.columnOption(column, 'headerFilter', {
-            ...column.headerFilter,
-            filterType: this.filterType,
-            // NOTE: Copy array because of mutations in legacy code
-            values: Array.isArray(this.filterValues)
-              ? [...this.filterValues]
-              : this.filterValues,
-          });
+          // NOTE: Copy array because of mutations in legacy code
+          const values = Array.isArray(this.filterValues)
+            ? [...this.filterValues]
+            : this.filterValues;
+          const { filterType } = this;
+          colsController.updateColumns(
+            (columns) => {
+              const index = getColumnIndexByName(columns, column.name);
+              const newColumns = [...columns];
+
+              newColumns[index] = {
+                ...newColumns[index],
+                headerFilter: {
+                  ...newColumns[index].headerFilter,
+                  values,
+                },
+                filterType,
+              };
+              return newColumns;
+            },
+          );
 
           onFilterCloseCallback?.();
         },

@@ -140,6 +140,7 @@ export const getDataSourceOptions = (
   dataSource,
   column,
   headerFilterOptions,
+  filter,
 ) => {
   if (!dataSource) {
     return undefined;
@@ -158,10 +159,9 @@ export const getDataSourceOptions = (
   }
 
   const cutoffLevel = Array.isArray(group) ? group.length - 1 : 0;
-  // const filter = this._dataController.getCombinedFilter();
 
   options.dataSource = {
-    // filter,
+    filter,
     group,
     useDefaultSearch: true,
     load: (options) => {

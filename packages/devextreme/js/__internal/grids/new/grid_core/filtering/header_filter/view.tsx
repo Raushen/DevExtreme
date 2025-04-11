@@ -4,11 +4,10 @@ import $ from '@js/core/renderer';
 import type { SubsGets } from '@ts/core/reactive';
 import { combined, effect } from '@ts/core/reactive';
 import { HeaderFilterView as OldHeaderFilterPopup } from '@ts/grids/grid_core/header_filter/m_header_filter_core';
+import { HeaderPanelView } from '@ts/grids/new/card_view/header_panel/view';
 import { View } from '@ts/grids/new/grid_core/core/view';
 import { WidgetMock } from '@ts/grids/new/grid_core/widget_mock';
 import { Component, createRef } from 'inferno';
-
-import { HeaderFilterController } from './controller';
 
 export interface OldHeaderFilterPopupInterface {
   render: (dxWrapper: dxElementWrapper) => void;
@@ -48,12 +47,12 @@ export class HeaderFilterPopupView extends View<{}> {
 
   public static dependencies = [
     WidgetMock,
-    HeaderFilterController,
+    HeaderPanelView,
   ] as const;
 
   constructor(
     private readonly widget: WidgetMock,
-    private readonly controller: HeaderFilterController,
+    private readonly headerPanelView: HeaderPanelView,
   ) {
     super();
     this.oldHeaderFilterPopup = new OldHeaderFilterPopup(this.widget);
@@ -67,7 +66,7 @@ export class HeaderFilterPopupView extends View<{}> {
 
         this.oldHeaderFilterPopup.showHeaderFilterMenu($(popupState.element), popupState.options);
       },
-      [this.controller.popupState$],
+      [this.headerPanelView.popupState$],
     );
   }
 

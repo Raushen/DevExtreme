@@ -1,13 +1,21 @@
+/* eslint-disable spellcheck/spell-checker */
 /* eslint-disable max-classes-per-file */
 import type { dxElementWrapper } from '@js/core/renderer';
 import $ from '@js/core/renderer';
 import type { SubsGets } from '@ts/core/reactive';
-import { combined, effect } from '@ts/core/reactive';
+import { combined, effect, state } from '@ts/core/reactive';
 import { HeaderFilterView as OldHeaderFilterPopup } from '@ts/grids/grid_core/header_filter/m_header_filter_core';
-import { HeaderPanelView } from '@ts/grids/new/card_view/header_panel/view';
 import { View } from '@ts/grids/new/grid_core/core/view';
 import { WidgetMock } from '@ts/grids/new/grid_core/widget_mock';
 import { Component, createRef } from 'inferno';
+
+import { ColumnsController } from '../../columns_controller';
+import type { Column } from '../../columns_controller/types';
+import { getColumnIndexByName } from '../../columns_controller/utils';
+import { OptionsController } from '../../options_controller/options_controller';
+import { SharedController } from '../../shared/controller';
+import type { PopupState } from './controller';
+import { getDataSourceOptions, getFilterType } from './legacy_header_filter';
 
 export interface OldHeaderFilterPopupInterface {
   render: (dxWrapper: dxElementWrapper) => void;
@@ -16,6 +24,95 @@ export interface OldHeaderFilterPopupInterface {
 
 export interface HeaderFilterPopupComponentProps {
   oldHeaderFilterPopup: OldHeaderFilterPopupInterface;
+}
+
+export class HeaderFilterView {
+  private readonly popupState = state<PopupState>(null);
+
+  public readonly popupState$: SubsGets<PopupState> = this.popupState;
+
+  public static dependencies = [
+    OptionsController,
+    SharedController,
+    ColumnsController,
+  ] as const;
+
+  constructor(
+    private readonly options: OptionsController,
+    private readonly sharedController: SharedController,
+    private readonly columnsController: ColumnsController,
+  ) { }
+
+  public openPopup(
+    element: Element,
+    column: Column,
+    onFilterCloseCallback?: () => void,
+  ): void {
+    const rootDataSource = this.sharedController.dataSource.unreactive_get();
+    const rootHeaderFilterOptions = this.options.oneWay('headerFilter').unreactive_get();
+    const displayFilter = this.sharedController.displayFilter.unreactive_get();
+
+    const filterDataSourceOptions = getDataSourceOptions(
+      rootDataSource,
+      {
+        ...column,
+        filterType: column.filterType,
+        filterValues: column.headerFilter?.values,
+      },
+      // NOTE: Only text used from root options
+      {
+        texts: rootHeaderFilterOptions.texts,
+      },
+      displayFilter,
+    );
+
+    const type = getFilterType(column);
+    const colsController = this.columnsController;
+
+    this.popupState.update({
+      element,
+      options: {
+        type,
+        headerFilter: { ...column.headerFilter },
+        dataSource: filterDataSourceOptions,
+        filterType: column.filterType,
+        // NOTE: Copy array because of mutations in legacy code
+        filterValues: Array.isArray(column.headerFilter?.values)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          ? [...column.headerFilter!.values]
+          : column.headerFilter?.values,
+        apply() {
+          // NOTE: Copy array because of mutations in legacy code
+          const values = Array.isArray(this.filterValues)
+            ? [...this.filterValues]
+            : this.filterValues;
+          const { filterType } = this;
+          colsController.updateColumns(
+            (columns) => {
+              const index = getColumnIndexByName(columns, column.name);
+              const newColumns = [...columns];
+
+              newColumns[index] = {
+                ...newColumns[index],
+                headerFilter: {
+                  ...newColumns[index].headerFilter,
+                  values,
+                },
+                filterType,
+              };
+              return newColumns;
+            },
+          );
+
+          onFilterCloseCallback?.();
+        },
+        hidePopupCallback: () => {
+          this.popupState.update(null);
+          onFilterCloseCallback?.();
+        },
+      },
+    });
+  }
 }
 
 export class HeaderFilterPopupComponent extends Component<HeaderFilterPopupComponentProps> {
@@ -47,12 +144,12 @@ export class HeaderFilterPopupView extends View<{}> {
 
   public static dependencies = [
     WidgetMock,
-    HeaderPanelView,
+    HeaderFilterView,
   ] as const;
 
   constructor(
     private readonly widget: WidgetMock,
-    private readonly headerPanelView: HeaderPanelView,
+    private readonly headerFilterView: HeaderFilterView,
   ) {
     super();
     this.oldHeaderFilterPopup = new OldHeaderFilterPopup(this.widget);
@@ -66,7 +163,7 @@ export class HeaderFilterPopupView extends View<{}> {
 
         this.oldHeaderFilterPopup.showHeaderFilterMenu($(popupState.element), popupState.options);
       },
-      [this.headerPanelView.popupState$],
+      [this.headerFilterView.popupState$],
     );
   }
 

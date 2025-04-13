@@ -21,6 +21,7 @@ import {
   HeaderFilterController,
   HeaderFilterPopupView,
 } from './filtering/header_filter';
+import { HeaderFilterView } from './filtering/header_filter/view';
 import { ItemsController } from './items_controller/items_controller';
 import { MainView } from './main_view';
 import { defaultOptions, defaultOptionsRules, type Options } from './options';
@@ -71,6 +72,8 @@ export class GridCoreNewBase<
 
   private filterPanelView!: FilterControllerModule.FilterPanelView;
 
+  private headerFilterView!: HeaderFilterView;
+
   protected _registerDIContext(): void {
     this.diContext = new DIContext();
     this.diContext.register(DataControllerModule.DataController);
@@ -89,6 +92,7 @@ export class GridCoreNewBase<
     this.diContext.register(FilterControllerModule.FilterController);
     this.diContext.register(FilterControllerModule.FilterPanelView);
     this.diContext.register(FilterPanelView);
+    this.diContext.register(HeaderFilterView);
     this.diContext.register(HeaderFilterController);
     this.diContext.register(HeaderFilterPopupView);
     this.diContext.register(ErrorController);
@@ -119,6 +123,7 @@ export class GridCoreNewBase<
     this.errorController = this.diContext.get(ErrorController);
     this.filterController = this.diContext.get(FilterControllerModule.FilterController);
     this.filterPanelView = this.diContext.get(FilterControllerModule.FilterPanelView);
+    this.headerFilterView = this.diContext.get(HeaderFilterView);
     this.searchView = this.diContext.get(SearchView);
   }
 

@@ -1,21 +1,21 @@
 /* eslint-disable spellcheck/spell-checker, no-spaced-func */
 import { describe, expect, it } from '@jest/globals';
-import { HeaderPanelView } from '@ts/grids/new/card_view/header_panel/view';
 import type { Column } from '@ts/grids/new/grid_core/columns_controller/types';
 import type { HeaderFilterColumnOptions } from '@ts/grids/new/grid_core/filtering/header_filter/types';
 import type { Options } from '@ts/grids/new/grid_core/options';
 
 import { ColumnsController } from '../../columns_controller/columns_controller';
 import { getContext } from '../../test_utils';
+import { HeaderFilterView } from './view';
 
 const setup = (config: Options = {}) => {
   const context = getContext(config);
 
-  const headerPanelView = context.get(HeaderPanelView);
+  const view = context.get(HeaderFilterView);
   const columnsController = context.get(ColumnsController);
 
   return {
-    headerPanelView,
+    view,
     columnsController,
   };
 };
@@ -25,10 +25,10 @@ describe('HeaderFilter', () => {
     describe('openPopup', () => {
       it('should pass element as is to popupState$', () => {
         const mockElement = {} as Element;
-        const { headerPanelView } = setup();
-        headerPanelView.openPopup(mockElement, {} as Column);
+        const { view } = setup();
+        view.openPopup(mockElement, {} as Column);
 
-        const result = headerPanelView.popupState$.unreactive_get();
+        const result = view.popupState$.unreactive_get();
         expect(result?.element).toBe(mockElement);
       });
 
@@ -41,10 +41,10 @@ describe('HeaderFilter', () => {
         { dataType: 'date', result: 'tree' },
         { dataType: 'datetime', result: 'tree' },
       ])('options.type in state with columns dataType "$dataType" -> "$result"', ({ dataType, result }) => {
-        const { headerPanelView } = setup();
-        headerPanelView.openPopup({} as Element, { dataType } as Column);
+        const { view } = setup();
+        view.openPopup({} as Element, { dataType } as Column);
 
-        const state = headerPanelView.popupState$.unreactive_get();
+        const state = view.popupState$.unreactive_get();
         expect(state?.options?.type).toBe(result);
       });
 
@@ -58,13 +58,13 @@ describe('HeaderFilter', () => {
           values: expectedFilterValues,
         } as HeaderFilterColumnOptions;
 
-        const { headerPanelView } = setup();
-        headerPanelView.openPopup(
+        const { view } = setup();
+        view.openPopup(
           {} as Element,
           { headerFilter: expectedHeaderFilter } as Column,
         );
 
-        const state = headerPanelView.popupState$.unreactive_get();
+        const state = view.popupState$.unreactive_get();
         expect(state?.options?.headerFilter).toStrictEqual(expectedHeaderFilter);
         expect(state?.options?.filterType).toEqual(expectedFilterType);
         expect(state?.options?.filterValues).toEqual(expectedFilterValues);
@@ -78,17 +78,17 @@ describe('HeaderFilter', () => {
           values: expectedFilterValues,
         } as HeaderFilterColumnOptions;
 
-        const { headerPanelView, columnsController } = setup({
+        const { view, columnsController } = setup({
           headerFilter: { visible: true },
           columns: [{ name: 'A' }],
         });
 
-        headerPanelView.openPopup(
+        view.openPopup(
           {} as Element,
           { name: 'A' } as Column,
         );
 
-        const state = headerPanelView.popupState$.unreactive_get();
+        const state = view.popupState$.unreactive_get();
         state?.options?.apply?.call({
           filterType: expectedFilterType,
           filterValues: expectedFilterValues,
@@ -113,17 +113,17 @@ describe('HeaderFilter', () => {
           values: expectedFilterValues,
         } as HeaderFilterColumnOptions;
 
-        const { headerPanelView, columnsController } = setup({
+        const { view, columnsController } = setup({
           headerFilter: { visible: true },
           columns: [{ name: 'A' }],
         });
 
-        headerPanelView.openPopup(
+        view.openPopup(
           {} as Element,
           { name: 'A', headerFilter: { search: expectedSearch } } as unknown as Column,
         );
 
-        const state = headerPanelView.popupState$.unreactive_get();
+        const state = view.popupState$.unreactive_get();
         state?.options?.apply?.call({
           filterType: expectedFilterType,
           filterValues: expectedFilterValues,
@@ -136,39 +136,39 @@ describe('HeaderFilter', () => {
       });
 
       it('should clear popupState$ on hide popup callback', () => {
-        const { headerPanelView } = setup({
+        const { view } = setup({
           headerFilter: { visible: true },
           columns: [{ name: 'A' }],
         });
 
-        headerPanelView.openPopup(
+        view.openPopup(
           {} as Element,
           { name: 'A' } as Column,
         );
 
-        const state = headerPanelView.popupState$.unreactive_get();
+        const state = view.popupState$.unreactive_get();
         expect(state !== null).toBeTruthy();
 
         state?.options?.hidePopupCallback?.();
 
-        const stateAfterClose = headerPanelView.popupState$.unreactive_get();
+        const stateAfterClose = view.popupState$.unreactive_get();
         expect(stateAfterClose === null).toBeTruthy();
       });
     });
 
     describe('openPopup - get dataSource legacy', () => {
       it('dataSource options should contain load and postProcess functions', () => {
-        const { headerPanelView } = setup({
+        const { view } = setup({
           headerFilter: { visible: true },
           columns: [{ name: 'A' }],
         });
 
-        headerPanelView.openPopup(
+        view.openPopup(
           {} as Element,
           { name: 'A' } as Column,
         );
 
-        const state = headerPanelView.popupState$.unreactive_get();
+        const state = view.popupState$.unreactive_get();
 
         expect(typeof state?.options.dataSource.load).toBe('function');
         expect(typeof state?.options.dataSource.postProcess).toBe('function');
@@ -198,17 +198,17 @@ describe('HeaderFilter', () => {
               checkFn: ([{ selector, compare }]): boolean => typeof selector === 'function' && typeof compare === 'function',
             },
           ])('$caseName: dataSource options should contains correct group', ({ column, checkFn }) => {
-            const { headerPanelView } = setup({
+            const { view } = setup({
               headerFilter: { visible: true },
               columns: [column],
             });
 
-            headerPanelView.openPopup(
+            view.openPopup(
               {} as Element,
               column,
             );
 
-            const state = headerPanelView.popupState$.unreactive_get();
+            const state = view.popupState$.unreactive_get();
 
             expect(state?.options.dataSource.group).toBeTruthy();
             expect(checkFn(state?.options.dataSource.group)).toBeTruthy();

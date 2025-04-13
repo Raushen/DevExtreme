@@ -1,14 +1,11 @@
 /* eslint-disable spellcheck/spell-checker */
 import type { SubsGets } from '@ts/core/reactive/index';
-import { combined, computed, state } from '@ts/core/reactive/index';
+import { combined, computed } from '@ts/core/reactive/index';
 import { ColumnsController } from '@ts/grids/new/grid_core/columns_controller/columns_controller';
 import { View } from '@ts/grids/new/grid_core/core/view';
 
 import type { Column } from '../../grid_core/columns_controller/types';
-import { getColumnIndexByName } from '../../grid_core/columns_controller/utils';
-import type { PopupState } from '../../grid_core/filtering/header_filter/controller';
-import { getDataSourceOptions, getFilterType } from '../../grid_core/filtering/header_filter/legacy_header_filter';
-import { SharedController } from '../../grid_core/shared/controller';
+import { HeaderFilterView } from '../../grid_core/filtering/header_filter/view';
 import { SortingController } from '../../grid_core/sorting_controller/sorting_controller';
 import { OptionsController } from '../options_controller';
 import type { HeaderPanelProps } from './header_panel';
@@ -21,18 +18,14 @@ export class HeaderPanelView extends View<HeaderPanelProps> {
     SortingController,
     ColumnsController,
     OptionsController,
-    SharedController,
+    HeaderFilterView,
   ] as const;
-
-  private readonly popupState = state<PopupState>(null);
-
-  public readonly popupState$: SubsGets<PopupState> = this.popupState;
 
   constructor(
     private readonly sortingController: SortingController,
     private readonly columnsController: ColumnsController,
     private readonly options: OptionsController,
-    private readonly sharedController: SharedController,
+    private readonly headerFilter: HeaderFilterView,
   ) {
     super();
   }
@@ -88,77 +81,6 @@ export class HeaderPanelView extends View<HeaderPanelProps> {
     column: Column,
     onFilterCloseCallback?: () => void,
   ): void {
-    this.openPopup(element, column, onFilterCloseCallback);
-  }
-
-  public openPopup(
-    element: Element,
-    column: Column,
-    onFilterCloseCallback?: () => void,
-  ): void {
-    const rootDataSource = this.sharedController.dataSource.unreactive_get();
-    const rootHeaderFilterOptions = this.options.oneWay('headerFilter').unreactive_get();
-    const displayFilter = this.sharedController.displayFilter.unreactive_get();
-
-    const filterDataSourceOptions = getDataSourceOptions(
-      rootDataSource,
-      {
-        ...column,
-        filterType: column.filterType,
-        filterValues: column.headerFilter?.values,
-      },
-      // NOTE: Only text used from root options
-      {
-        texts: rootHeaderFilterOptions.texts,
-      },
-      displayFilter,
-    );
-
-    const type = getFilterType(column);
-    const colsController = this.columnsController;
-
-    this.popupState.update({
-      element,
-      options: {
-        type,
-        headerFilter: { ...column.headerFilter },
-        dataSource: filterDataSourceOptions,
-        filterType: column.filterType,
-        // NOTE: Copy array because of mutations in legacy code
-        filterValues: Array.isArray(column.headerFilter?.values)
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          ? [...column.headerFilter!.values]
-          : column.headerFilter?.values,
-        apply() {
-          // NOTE: Copy array because of mutations in legacy code
-          const values = Array.isArray(this.filterValues)
-            ? [...this.filterValues]
-            : this.filterValues;
-          const { filterType } = this;
-          colsController.updateColumns(
-            (columns) => {
-              const index = getColumnIndexByName(columns, column.name);
-              const newColumns = [...columns];
-
-              newColumns[index] = {
-                ...newColumns[index],
-                headerFilter: {
-                  ...newColumns[index].headerFilter,
-                  values,
-                },
-                filterType,
-              };
-              return newColumns;
-            },
-          );
-
-          onFilterCloseCallback?.();
-        },
-        hidePopupCallback: () => {
-          this.popupState.update(null);
-          onFilterCloseCallback?.();
-        },
-      },
-    });
+    this.headerFilter.openPopup(element, column, onFilterCloseCallback);
   }
 }

@@ -4,6 +4,7 @@ import type { dxElementWrapper } from '@js/core/renderer';
 import $ from '@js/core/renderer';
 import type { SubsGets } from '@ts/core/reactive';
 import { combined, effect, state } from '@ts/core/reactive';
+import { removeFieldConditionsFromFilter } from '@ts/filter_builder/m_utils';
 import { HeaderFilterView as OldHeaderFilterPopup } from '@ts/grids/grid_core/header_filter/m_header_filter_core';
 import { View } from '@ts/grids/new/grid_core/core/view';
 import { WidgetMock } from '@ts/grids/new/grid_core/widget_mock';
@@ -16,6 +17,7 @@ import { OptionsController } from '../../options_controller/options_controller';
 import { SharedController } from '../../shared/controller';
 import type { PopupState } from './controller';
 import { getDataSourceOptions, getFilterType } from './legacy_header_filter';
+import { getColumnIdentifier } from './utils';
 
 export interface OldHeaderFilterPopupInterface {
   render: (dxWrapper: dxElementWrapper) => void;
@@ -50,7 +52,9 @@ export class HeaderFilterView {
   ): void {
     const rootDataSource = this.sharedController.dataSource.unreactive_get();
     const rootHeaderFilterOptions = this.options.oneWay('headerFilter').unreactive_get();
-    const displayFilter = this.sharedController.displayFilter.unreactive_get();
+    const displayFilter = this.sharedController.appliedFilters.unreactive_get();
+    const columnId = getColumnIdentifier(column);
+    const actualFilter = removeFieldConditionsFromFilter(displayFilter, columnId);
 
     const filterDataSourceOptions = getDataSourceOptions(
       rootDataSource,
@@ -63,7 +67,7 @@ export class HeaderFilterView {
       {
         texts: rootHeaderFilterOptions.texts,
       },
-      displayFilter,
+      actualFilter,
     );
 
     const type = getFilterType(column);
